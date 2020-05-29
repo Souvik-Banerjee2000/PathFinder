@@ -6,7 +6,7 @@ let formGroup = document.querySelector('.form-group');
 let firstHeading = document.getElementById('first-heading');
 // var selection = document.getElementById('selection');
 //Global Variables
-//1.distanceMatrix,2.cityLength,3.counter,4.citiesObject
+//1.distanceMatrix,2.cities,3.counter,4.citiesObject
 
 
 loadEventListeners();
@@ -18,14 +18,15 @@ function loadEventListeners(){
 }
 
 function getValue(e){
+
     window.distanceMatrix = [];
     window.cities = form.firstElementChild.value.split(',');
     e.preventDefault();
     form.remove();
-    firstHeading.textContent = 'Enter The Respective City Distances Leave a 0 if two cities are not connected';
-    getDistances(cities);
     window.cityLength = cities.length;
     loadMatrix(window.cityLength);
+    window.inf = 11111;
+    createSource(inf);
     
 }
 
@@ -44,9 +45,90 @@ function loadMatrix(len) {
 
 
 
+
+function createSource() {
+
+    var selectionForm = document.getElementById('selection-form');
+    // console.log(selectionForm);
+
+    let firstHeading = document.getElementById('first-heading');
+    firstHeading.textContent = "Choose Your Source";
+    var selection = document.createElement('select');
+    var sub = document.createElement('input');
+    selection.id = 'selection';
+    for (i = 0; i < cityLength; i++) {
+
+        sourceOption = document.createElement('option');
+        sourceOption.id = `option${cities[i]}`;
+        sourceOption.value = `${cities[i]}`;
+        sourceOption.textContent = `${cities[i]}`
+        selection.appendChild(sourceOption);
+    }
+    sub.type = 'submit';
+    sub.value = 'Submit';
+
+    selectionForm.appendChild(selection);
+    selectionForm.appendChild(sub);
+    // console.log(selectionForm);
+
+    document.body.appendChild(selectionForm);
+    chooseSource();
+}
+
+
+
+function chooseSource() {
+    var selectionForm = document.getElementById('selection-form');
+    // console.log(selectionForm);
+
+    selectionForm.addEventListener('submit', (e) => {
+        var optionValue = e.target.firstElementChild.value;
+        // console.log("The Input Matrix Formed");
+        // console.log(distanceMatrix);
+        // console.log(optionValue);
+        e.preventDefault();
+        removeForm();
+        cities = modifyCities(cities,optionValue);
+        // console.log(cities);
+        
+        getDistances(cities);
+
+    });
+
+}
+
+function removeForm(){
+
+    var selectionForm = document.getElementById('selection-form');
+    selectionForm.remove();
+
+}
+function modifyCities(cities,source){
+
+    var temp = []
+    // console.log(source);
+    
+    for (var i = 0; i < cityLength; i++) {
+        if (cities[i] === source)
+            continue;
+        else
+            temp[i] = cities[i];
+
+    }
+    temp.unshift(source);
+    temp = temp.filter(function (e) { return e != null; });
+    // console.log(temp);
+    
+    return temp;
+
+}
+
 function getDistances(cities){
     cityLength = cities.lenght;
     window.counter = 1;
+
+    let firstHeading = document.getElementById('first-heading');
+    firstHeading.textContent = 'Enter The Respective City Distances Leave a 0 if two cities are not connected';
     for(var i=0;i<cities.length;i++){
         for(j=i+1;j<cities.length;j++){
             distanceForm = document.createElement('form');
@@ -68,6 +150,7 @@ function getDistances(cities){
 
         }
     }
+    
     saveDistance();
 }
 
@@ -100,21 +183,23 @@ function saveDistance(){
 
 
 function formMatrix() {
+    console.log(`Cities According to your input, Source is ${cities[0]}`)
+    console.log(cities);
     let ctr = 1;
-    for(var i=0;i<window.cityLength;i++){
-        for(var j=i+1;j<window.cityLength;j++){
+    for(var i=0;i<cities.length;i++){
+        for(var j=i+1;j<cities.length;j++){
 
                 distanceMatrix[i][j] = Number(citiesObject[ctr]);
                 distanceMatrix[j][i] = Number(citiesObject[ctr]);
                 ctr++;
-
+                // console.log(distanceMatrix);
                 
             }
         }
         // console.log(distanceMatrix);
-        window.inf = 11111;
-        for(var i=0;i<cityLength;i++){
-            for(var j=0;j<cityLength;j++){
+        
+        for(var i=0;i<cities.length;i++){
+            for(var j=0;j<cities.length;j++){
                 if(i===j)
                     continue;
                 
@@ -123,60 +208,11 @@ function formMatrix() {
                 }
             }
         }
-
-    // console.log(distanceMatrix);
-    // calculate(distanceMatrix,cityLength,inf);
-    createSource(inf);
-}
-
-function createSource(){
-
-    var selectionForm = document.getElementById('selection-form');
-    // console.log(selectionForm);
-    
-    var selection = document.createElement('select');
-    var sub = document.createElement('input');
-    selection.id = 'selection';
-    for (i = 0; i < cityLength; i++) {
-
-        sourceOption = document.createElement('option');
-        sourceOption.id = `option${cities[i]}`;
-        sourceOption.value = `${cities[i]}`;
-        sourceOption.textContent = `${cities[i]}`
-        selection.appendChild(sourceOption);
-    }
-    sub.type = 'submit';
-    sub.value = 'Submit';
-
-    selectionForm.appendChild(selection);
-    selectionForm.appendChild(sub);
-    // console.log(selectionForm);
-    
-    document.body.appendChild(selectionForm);
-    chooseSource();
-}
-
-function chooseSource(){
-    var selectionForm = document.getElementById('selection-form');
-    // console.log(selectionForm);
-    
-    selectionForm.addEventListener('submit',(e)=>{
-    var optionValue = e.target.firstElementChild.value;
-    // console.log(cities.indexOf(optionValue));
-    console.log("The Input Matrix Formed");
+    console.log("The Graph is (According to your input:-")
     console.log(distanceMatrix);
+
+    calculate(distanceMatrix,cities.length,inf,0);
     
-        removeFormAndCallCalculate(distanceMatrix, cityLength, inf, cities.indexOf(optionValue))
-        e.preventDefault();
-        
-    })
-}
-
-function removeFormAndCallCalculate(distanceMatrix, cityLength, inf,source){
-
-    var selectionForm = document.getElementById('selection-form');
-    selectionForm.remove();
-    calculate(distanceMatrix, cityLength, inf, source);
 }
 
 
@@ -207,11 +243,6 @@ function calculate(distanceMatrix, noOfCities, inf, source) {
     //Filling the first column where each vertices stay
     j = 0;
     for (var i = 0; i < noOfCities; i++) {
-        if (i === 0)
-            propagationMatrix[i][j] = source;
-        else if (i === source)
-            continue;
-        else
             propagationMatrix[i][j] = i;
     }
 
@@ -262,11 +293,12 @@ function calculate(distanceMatrix, noOfCities, inf, source) {
 } 
 
 function putResults(propagationMatrix,inf,source){
-
+    // console.log(propagationMatrix);
+    
     let firstHeading = document.getElementById('first-heading');
     firstHeading.textContent = 'Result Of your Graph is:-'
     var results = document.getElementById('showresults');
-    for(var i=1;i<cityLength;i++){
+    for(var i=1;i<cities.length;i++){
         var currentNode = propagationMatrix[i][0];
         var currentCity = cities[currentNode];
         var currentResult = propagationMatrix[i][1];
@@ -281,4 +313,20 @@ function putResults(propagationMatrix,inf,source){
         results.appendChild(tcon); 
         results.appendChild(br);
     }
+    reloader();
+
+}
+function reloader(){
+
+    var results = document.getElementById('showresults');
+    var btn = document.createElement('button');
+    btn.innerText = 'Go TO Home';
+    btn.id = 'reloader';
+    results.appendChild(btn);
+    reloader = document.getElementById('reloader');
+    reloader.addEventListener('click', (e) => {
+        window.location.reload();
+
+    });
+
 }
