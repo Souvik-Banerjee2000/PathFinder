@@ -124,9 +124,7 @@ function modifyCities(cities,source){
 }
 
 function getDistances(cities){
-    cityLength = cities.lenght;
     window.counter = 1;
-
     let firstHeading = document.getElementById('first-heading');
     firstHeading.textContent = 'Enter The Respective City Distances Leave a 0 if two cities are not connected';
     for(var i=0;i<cities.length;i++){
@@ -150,7 +148,10 @@ function getDistances(cities){
 
         }
     }
-    
+    var bugLogger = document.createElement('h3');
+    bugLogger.id = 'bugLogger';
+    bugLogger.textContent = `Submit The last form at the very last which is distances between ${cities[cities.length-2]} and ${cities[cities.length -1]}`;
+    formGroup.appendChild(bugLogger);
     saveDistance();
 }
 
@@ -294,7 +295,7 @@ function calculate(distanceMatrix, noOfCities, inf, source) {
 
 function putResults(propagationMatrix,inf,source){
     // console.log(propagationMatrix);
-    
+    document.getElementById('bugLogger').remove();
     let firstHeading = document.getElementById('first-heading');
     firstHeading.textContent = 'Result Of your Graph is:-'
     var results = document.getElementById('showresults');
